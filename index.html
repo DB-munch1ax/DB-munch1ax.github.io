@@ -1,378 +1,559 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025학년도 학생자치기구 통합 예산안</title>
-    <!-- Tailwind CSS (스타일링 도구) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM (리액트 핵심 라이브러리) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel (브라우저에서 리액트 코드를 실행하게 해주는 도구) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <style>
-        /* 애니메이션 효과 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 체육대회 대진표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #F7F6F3;
+  --border: #E8E7E3;
+  --text: #1A1A18;
+  --muted: #9A9992;
+  --accent: #2563EB;
+  --line: #D4D2CC;
+  --slot-h: 56px;
+  --match-w: 116px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+.page {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 52px 64px 80px;
+}
+
+/* ── Header ── */
+.page-emoji { font-size: 52px; margin-bottom: 14px; display: block; }
+.page-title {
+  font-size: 38px; font-weight: 700;
+  letter-spacing: -0.8px; margin-bottom: 6px;
+}
+.page-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+/* ── Properties ── */
+.props {
+  display: flex; flex-wrap: wrap; gap: 0;
+  border: 1px solid var(--border); border-radius: 6px;
+  margin-bottom: 40px; overflow: hidden;
+}
+.prop-row {
+  display: flex; align-items: center;
+  width: 100%; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.prop-row:last-child { border-bottom: none; }
+.prop-key {
+  width: 120px; padding: 9px 14px;
+  color: var(--muted); font-size: 12px; font-weight: 500;
+  border-right: 1px solid var(--border); flex-shrink: 0;
+}
+.prop-val { padding: 9px 14px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge {
+  font-size: 12px; padding: 2px 10px; border-radius: 20px; font-weight: 500;
+}
+.badge-blue  { background: #EEF2FF; color: #3730A3; }
+.badge-green { background: #F0FDF4; color: #166534; }
+.badge-amber { background: #FFFBEB; color: #92400E; }
+.note-inline { font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+/* ── Divider ── */
+hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px; overflow-x: auto;
+}
+.tab {
+  padding: 9px 18px; border: none; background: none;
+  font-family: inherit; font-size: 13.5px; font-weight: 500;
+  color: var(--muted); cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.on { color: var(--text); border-bottom-color: var(--text); }
+
+/* ── Sport view ── */
+.sport-view { display: none; }
+.sport-view.on { display: block; }
+
+.view-legend {
+  display: flex; gap: 16px; align-items: center;
+  font-size: 12px; color: var(--muted); margin-bottom: 20px; flex-wrap: wrap;
+}
+.bye-note {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; background: #F0FDF4;
+  border: 1px dashed #86EFAC; border-radius: 4px;
+  padding: 3px 10px; color: #166534;
+}
+
+/* ── Bracket ── */
+.bracket-scroll { overflow-x: auto; padding-bottom: 16px; }
+.bracket {
+  display: inline-flex; align-items: stretch; gap: 0;
+}
+
+/* Round column */
+.rcol { display: flex; flex-direction: column; flex-shrink: 0; }
+.rcol-head {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted);
+  text-align: center; padding: 0 8px 14px; white-space: nowrap;
+}
+.rcol-body { display: flex; flex-direction: column; }
+
+/* Match slot */
+.mslot {
+  display: flex; align-items: center;
+  padding: 4px 8px;
+}
+.mbox { width: var(--match-w); }
+
+/* Team slot */
+.t {
+  display: block; padding: 5px 10px;
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: 3px; font-size: 12.5px; color: var(--text);
+  margin: 2px 0; min-height: 28px; line-height: 1.5;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background .12s;
+}
+.t:hover { background: #EEEDEA; }
+.t.tbd   { background: #FAFAF8; color: #C0BFB9; font-style: italic; font-size: 12px; }
+.t.bye   { background: #F0FDF4; border: 1px dashed #86EFAC; color: #166534; }
+
+/* Connector column */
+.ccol {
+  width: 26px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+.cpair {
+  position: relative;
+  border-right: 1.5px solid var(--line);
+}
+.cpair::before,
+.cpair::after {
+  content: ''; position: absolute;
+  left: 0; right: 0; height: 1.5px;
+  background: var(--line);
+}
+.cpair::before { top: 25%; }
+.cpair::after  { top: 75%; }
+.csingle {
+  position: relative;
+}
+.csingle::after {
+  content: ''; position: absolute;
+  left: 50%; right: 0; top: 50%; height: 1.5px;
+  background: var(--line);
+}
+
+/* Group stage (6강전) */
+.gs-col { display: flex; flex-direction: column; flex-shrink: 0; }
+.gs-slot {
+  display: flex; align-items: flex-start;
+  padding: 8px 8px 8px 10px;
+}
+.gs-box { width: 130px; }
+.gs-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); margin-bottom: 6px;
+}
+.gs-rule {
+  font-size: 10.5px; background: #FFFBEB; color: #92400E;
+  border: 1px solid #FDE68A; border-radius: 3px;
+  padding: 2px 7px; margin-bottom: 7px; display: inline-block;
+}
+
+/* Champion */
+.champ-wrap {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 12px; flex-shrink: 0; width: 130px;
+}
+.champ-card {
+  background: linear-gradient(160deg, #FFFCE8 0%, #FEF3C7 100%);
+  border: 1.5px solid #FCD34D; border-radius: 8px;
+  padding: 18px 14px; text-align: center; width: 108px;
+}
+.champ-icon { font-size: 26px; }
+.champ-lbl  { font-size: 10px; color: var(--muted); letter-spacing: .07em; margin-top: 8px; }
+.champ-val  { font-size: 13px; font-weight: 700; margin-top: 4px; min-height: 20px; }
+
+/* 3·4위전 section */
+.extra-round {
+  margin-top: 28px;
+  display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap;
+}
+.mini-section { }
+.mini-head {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); margin-bottom: 10px;
+}
+.mini-match { display: flex; align-items: center; gap: 8px; }
+.mini-vs { font-size: 11px; color: var(--muted); margin: 0 4px; }
+.mini-result {
+  font-size: 12px; color: var(--muted); margin-left: 8px;
+  background: #F7F6F3; border: 1px solid var(--border);
+  border-radius: 3px; padding: 3px 10px;
+}
+</style>
 </head>
-<body class="bg-gray-50">
-    <div id="root"></div>
+<body>
+<div class="page">
 
-    <script type="text/babel">
-        // React 기능 가져오기
-        const { useState } = React;
+  <!-- Header -->
+  <span class="page-emoji">🏆</span>
+  <h1 class="page-title">2026 체육대회 대진표</h1>
+  <p class="page-sub">한서대학교 · 34대 학생회 주최</p>
 
-        // 아이콘 컴포넌트 (Lucide 아이콘을 SVG로 직접 구현)
-        const Users = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        );
-        const Building = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
-        );
-        const PieChart = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-        );
-        const ArrowRight = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        );
-        const Wallet = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-        );
+  <!-- Properties -->
+  <div class="props">
+    <div class="prop-row">
+      <div class="prop-key">종목</div>
+      <div class="prop-val">
+        <span class="badge badge-blue">⚽ 축구</span>
+        <span class="badge badge-blue">🏀 농구</span>
+        <span class="badge badge-blue">🤾 족구</span>
+        <span class="badge badge-blue">🎯 피구(남)</span>
+        <span class="badge badge-blue">🎯 피구(여)</span>
+        <span class="badge badge-blue">⚾ 발야구</span>
+      </div>
+    </div>
+    <div class="prop-row">
+      <div class="prop-key">규칙</div>
+      <div class="prop-val">
+        <span class="badge badge-amber">승리팀 음영 표시</span>
+        <span class="badge badge-green">득실차 부전승 (축구·농구 6강전)</span>
+      </div>
+    </div>
+    <div class="prop-row">
+      <div class="prop-key">상태</div>
+      <div class="prop-val"><span class="badge badge-green">대진 확정</span></div>
+    </div>
+  </div>
 
-        // 메인 컴포넌트
-        const BudgetSheet = () => {
-            const [activeOrg, setActiveOrg] = useState('clubAlliance');
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab on"  onclick="show('s1',this)">⚽ 축구</button>
+    <button class="tab"     onclick="show('s2',this)">🏀 농구</button>
+    <button class="tab"     onclick="show('s3',this)">🤾 족구</button>
+    <button class="tab"     onclick="show('s4',this)">🎯 피구 (남)</button>
+    <button class="tab"     onclick="show('s5',this)">🎯 피구 (여)</button>
+    <button class="tab"     onclick="show('s6',this)">⚾ 발야구</button>
+  </div>
 
-            // 데이터 1: 총동아리연합회
-            const clubAllianceBudget = [
-                {
-                category: "동아리 박람회",
-                items: [
-                    { name: "행사 진행 식대", detail: "8명 * 9,000원", cost: 72000, note: "행사 진행 식대" },
-                    { name: "진행 물품 대여비", detail: "1식", cost: 500000, note: "진행 물품 대여" },
-                    { name: "예비비", detail: "1식", cost: 98000, note: "예비비" },
-                ],
-                subtotal: 670000
-                },
-                {
-                category: "1학기 동아리의 밤",
-                items: [
-                    { name: "음향 팀", detail: "(주)탑플랜엔터테인먼트", cost: 6050000, note: "음향업체 및 영상 중계" },
-                    { name: "공연 MC", detail: "이노베이 주식회사", cost: 300000, note: "" },
-                    { name: "기타 물품", detail: "미정", cost: 687000, note: "사진 이벤트 및 행사진행용품" },
-                    { name: "쿠폰", detail: "음주다방, 세이커피", cost: 46000, note: "" },
-                    { name: "자선 사업 수익", detail: "수익 차감", cost: -200000, note: "사진 촬영 행사 사업 (예상 수익)" },
-                ],
-                subtotal: 6883000
-                },
-                {
-                category: "2학기 동아리의 밤",
-                items: [
-                    { name: "음향 팀", detail: "(주)탑플랜엔터테인먼트", cost: 4050000, note: "음향업체 및 특수효과" },
-                    { name: "공연 MC", detail: "(주)탑플랜엔터테인먼트", cost: 500000, note: "" },
-                    { name: "기타 물품", detail: "미정", cost: 400000, note: "행사 진행 용품" },
-                    { name: "쿠폰", detail: "음주다방, 세이커피", cost: 53000, note: "" },
-                ],
-                subtotal: 5003000
-                },
-                {
-                category: "동아리 성과발표제",
-                items: [
-                    { name: "시상금 (1등)", detail: "1팀", cost: 800000, note: "" },
-                    { name: "시상금 (2등)", detail: "1팀", cost: 500000, note: "" },
-                    { name: "시상금 (3등)", detail: "1팀", cost: 300000, note: "" },
-                    { name: "장려상", detail: "1팀", cost: 100000, note: "" },
-                    { name: "간식 및 음료", detail: "", cost: 200000, note: "" },
-                ],
-                subtotal: 1900000
-                }
-            ];
+  <div id="s1" class="sport-view on"></div>
+  <div id="s2" class="sport-view"></div>
+  <div id="s3" class="sport-view"></div>
+  <div id="s4" class="sport-view"></div>
+  <div id="s5" class="sport-view"></div>
+  <div id="s6" class="sport-view"></div>
 
-            // 데이터 2: 총대의원회
-            const councilBudget = [
-                {
-                category: "감사용",
-                desc: "감사, 청문회, 대의원총회 등 운영 및 검증 비용",
-                items: [
-                    { name: "상반기 1차 감사 식대", cost: 350000 },
-                    { name: "청문회 부식비", cost: 50000 },
-                    { name: "상반기 2차 감사 식대", cost: 350000 },
-                    { name: "대의원총회 부식비", cost: 150000 },
-                    { name: "하반기 1차 감사 식대", cost: 420000 },
-                ],
-                subtotal: 1320000
-                },
-                {
-                category: "선거용",
-                desc: "선관위 운영 및 선거 기간 식대",
-                items: [
-                    { name: "선관위 부식비", cost: 40000 },
-                    { name: "청문회 및 선거 부식비", cost: 200000 },
-                    { name: "총학 선거 식대", cost: 600000 },
-                    { name: "재선거 식대", cost: 500000 },
-                ],
-                subtotal: 1340000
-                },
-                {
-                category: "사무 및 운영용",
-                desc: "일반 사업 운영 비용 (과잠, 행사, 회의비 등)",
-                items: [
-                    { name: "대의원 과잠 및 명찰 구입", cost: 750000 },
-                    { name: "전년도 스카", cost: 420000 },
-                    { name: "학회장 회의 부식비", cost: 150000 },
-                    { name: "농활 진행요원 단체복 및 국원 과잠", cost: 800000 },
-                    { name: "스피드 카피 (복사/인쇄)", cost: 400000 },
-                    { name: "대동제 부스 운영 및 경품", cost: 1600000 },
-                    { name: "주간부스 식대", cost: 150000 },
-                    { name: "간담회", cost: 300000 },
-                    { name: "유류비 총계", cost: 250000 },
-                ],
-                subtotal: 4820000
-                }
-            ];
+</div>
 
-            // 총계 계산
-            const allianceTotal = clubAllianceBudget.reduce((acc, curr) => acc + curr.subtotal, 0);
-            const councilTotal = councilBudget.reduce((acc, curr) => acc + curr.subtotal, 0);
-            const grandTotal = allianceTotal + councilTotal;
+<script>
+/* ──────────────────────────────
+   DATA
+────────────────────────────── */
+const SH = 56; // slot height px
 
-            const formatCurrency = (amount) => {
-                return new Intl.NumberFormat('ko-KR').format(amount);
-            };
+const SPORTS = [
+  {
+    id:'s1', name:'축구', emoji:'⚽', teams:24,
+    kind:'grouped',
+    r1: { name:'24강전', matches:[
+      ['항관','재활'],['물치','무항'],['산디','항소'],['전자','교물'],
+      ['항기','호카'],['항산','항전'],['자전','작치'],['경호','헬기'],
+      ['정비','보안'],['운항','공행'],['해경','레저'],['방사선','신소재'],
+    ]},
+    r2: { name:'12강전', n:6 },
+    gs: { name:'6강전', rule:'득실차 부전승', groups:[
+      {name:'A조', teams:['','','']},
+      {name:'B조', teams:['','','']},
+    ]},
+    fin: '결승전',
+  },
+  {
+    id:'s2', name:'농구', emoji:'🏀', teams:25,
+    kind:'grouped',
+    r1: { name:'22강전', matches:[
+      ['해경','항소'],['항관','항보'],['교물','간호'],['항정','항기'],
+      ['자전','신소재'],['물치','문화재'],['공행','항산'],['헬기','경호'],
+      ['방사선','항운'],['재활','산디'],['무항','작치'],['전기전자','항전'],
+    ], note:'마지막 조: 전기전자 · 항전 · 호카 (3팀 리그)'},
+    r2: { name:'12강전', n:6 },
+    gs: { name:'6강전', rule:'득실차 부전승', groups:[
+      {name:'A조', teams:['','','']},
+      {name:'B조', teams:['','','']},
+    ]},
+    fin: '결승전',
+  },
+  {
+    id:'s3', name:'족구', emoji:'🤾', teams:18,
+    kind:'ko4',
+    byes:['사회복지','항산'],
+    r1: { name:'16강전', matches:[
+      ['작치','헬기'],['방사선','항보'],['항관','물치'],['해경','항교물'],
+      ['자전','항전'],['항정','경비'],['무항','신소재'],['항기','의료재활'],
+    ]},
+    r2:{ name:'8강전', n:4 },
+    r3:{ name:'준결승', n:2 },
+    tp: '3·4위전',
+    fin:'결승전',
+  },
+  {
+    id:'s4', name:'피구(남)', emoji:'🎯', teams:15,
+    kind:'ko4',
+    byes:['물치'],
+    r1:{ name:'16강전', matches:[
+      ['항전','무항'],['방사선','항산'],['간호','신소재'],['항보','자전'],
+      ['경호','항소'],['헬기','항정'],['작치','교물'],
+    ]},
+    r2:{ name:'8강전', n:4 },
+    r3:{ name:'준결승', n:2 },
+    tp:'3·4위전',
+    fin:'결승전',
+  },
+  {
+    id:'s5', name:'피구(여)', emoji:'🎯', teams:18,
+    kind:'ko4',
+    byes:['호카','경비'],
+    r1:{ name:'16강전', matches:[
+      ['공행','작치'],['항산','치위생'],['산디','간호'],['헬기','항운'],
+      ['무항','항외'],['자전','항관'],['항교물','방사선'],['항보','물치'],
+    ]},
+    r2:{ name:'8강전', n:4 },
+    r3:{ name:'준결승', n:2 },
+    tp:'3·4위전',
+    fin:'결승전',
+  },
+  {
+    id:'s6', name:'발야구', emoji:'⚾', teams:16,
+    kind:'ko4',
+    byes:[],
+    r1:{ name:'16강전', matches:[
+      ['산디','미정'],['레저','무항'],['방사선','물치'],['항교물','항보'],
+      ['치위생','작치'],['헬기','경비'],['항운','간호'],['항소','미정'],
+    ]},
+    r2:{ name:'8강전', n:4 },
+    r3:{ name:'준결승', n:2 },
+    tp:'3·4위전',
+    fin:'결승전',
+  },
+];
 
-            return (
-                <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen font-sans">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    
-                    {/* 메인 헤더 */}
-                    <div className="p-8 border-b border-gray-200 bg-slate-900 text-white">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <Wallet className="text-yellow-400" size={24} />
-                            <h1 className="text-2xl font-bold">2025학년도 학생자치기구 통합 예산안</h1>
-                        </div>
-                        <p className="text-slate-300 text-sm pl-8">총동아리연합회 및 총대의원회 예산 내역서</p>
-                        </div>
-                        <div className="bg-slate-800 px-6 py-3 rounded-lg border border-slate-700 text-right min-w-[200px]">
-                        <p className="text-xs text-slate-400 mb-1">전체 통합 예산</p>
-                        <p className="text-3xl font-bold text-yellow-400">{formatCurrency(grandTotal)}원</p>
-                        </div>
-                    </div>
-                    </div>
+/* ──────────────────────────────
+   HELPERS
+────────────────────────────── */
+function T(name) {
+  if (!name || name === '') return `<div class="t tbd">진출팀</div>`;
+  if (name === '미정')      return `<div class="t tbd">미정</div>`;
+  return `<div class="t">${name}</div>`;
+}
+function Tbye(name) { return `<div class="t bye">🎗 ${name} (부전승)</div>`; }
 
-                    {/* 조직 선택 탭 (대분류) */}
-                    <div className="grid grid-cols-2 border-b border-gray-200 bg-gray-100 p-2 gap-2">
-                    <button
-                        onClick={() => setActiveOrg('clubAlliance')}
-                        className={`py-4 px-6 rounded-lg text-center font-medium transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
-                        activeOrg === 'clubAlliance'
-                            ? 'bg-white text-indigo-900 shadow-sm ring-1 ring-black/5'
-                            : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-                        }`}
-                    >
-                        <div className="flex items-center gap-2">
-                        <Users size={20} className={activeOrg === 'clubAlliance' ? 'text-indigo-600' : ''} />
-                        <span className="text-lg">총동아리연합회</span>
-                        </div>
-                        <span className={`text-sm px-2 py-0.5 rounded-full ${
-                        activeOrg === 'clubAlliance' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-200 text-gray-500'
-                        }`}>
-                        행사 예산 {formatCurrency(allianceTotal)}원
-                        </span>
-                    </button>
-                    
-                    <button
-                        onClick={() => setActiveOrg('council')}
-                        className={`py-4 px-6 rounded-lg text-center font-medium transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
-                        activeOrg === 'council'
-                            ? 'bg-white text-emerald-900 shadow-sm ring-1 ring-black/5'
-                            : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-                        }`}
-                    >
-                        <div className="flex items-center gap-2">
-                        <Building size={20} className={activeOrg === 'council' ? 'text-emerald-600' : ''} />
-                        <span className="text-lg">총대의원회</span>
-                        </div>
-                        <span className={`text-sm px-2 py-0.5 rounded-full ${
-                        activeOrg === 'council' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-500'
-                        }`}>
-                        운영 예산 {formatCurrency(councilTotal)}원
-                        </span>
-                    </button>
-                    </div>
+function roundCol(headName, slots) {
+  return `<div class="rcol">
+    <div class="rcol-head">${headName}</div>
+    <div class="rcol-body">${slots}</div>
+  </div>`;
+}
 
-                    {/* 상세 내역 컨텐츠 */}
-                    <div className="p-8 bg-white min-h-[500px]">
-                    {activeOrg === 'clubAlliance' ? (
-                        <div className="space-y-8 animate-fade-in">
-                        <div className="flex items-center gap-3 pb-4 border-b border-indigo-100">
-                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                            <Users size={20} />
-                            </div>
-                            <div>
-                            <h2 className="text-xl font-bold text-gray-800">총동아리연합회 행사 비용</h2>
-                            <p className="text-sm text-gray-500">동아리 박람회 및 축제 등 주요 행사 예산</p>
-                            </div>
-                        </div>
+function connCol(pairs, pairH) {
+  let s = '';
+  for (let i=0;i<pairs;i++) s += `<div class="cpair" style="height:${pairH}px"></div>`;
+  return `<div class="ccol">${s}</div>`;
+}
+function connColSingle(totalH) {
+  return `<div class="ccol"><div class="csingle" style="height:${totalH}px"></div></div>`;
+}
 
-                        {clubAllianceBudget.map((event, index) => (
-                            <div key={index} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-r from-indigo-50 to-white px-5 py-3 border-b border-indigo-100 flex justify-between items-center">
-                                <h3 className="font-bold text-indigo-900 text-lg flex items-center gap-2">
-                                <span className="w-1.5 h-6 bg-indigo-500 rounded-full block"></span>
-                                {event.category}
-                                </h3>
-                                <span className="font-bold text-indigo-700 bg-white px-3 py-1 rounded-full border border-indigo-100 shadow-sm">
-                                {formatCurrency(event.subtotal)}원
-                                </span>
-                            </div>
-                            <div className="p-0">
-                                <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50 text-gray-500 border-b border-gray-100">
-                                    <tr>
-                                    <th className="px-5 py-3 font-medium w-[30%]">항목</th>
-                                    <th className="px-5 py-3 font-medium w-[30%]">세부내용/업체</th>
-                                    <th className="px-5 py-3 font-medium text-right text-xs uppercase tracking-wider">비고</th>
-                                    <th className="px-5 py-3 font-medium text-right">금액</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {event.items.map((item, i) => (
-                                    <tr key={i} className="hover:bg-indigo-50/30 transition-colors">
-                                        <td className="px-5 py-3 font-medium text-gray-800">{item.name}</td>
-                                        <td className="px-5 py-3 text-gray-600">{item.detail}</td>
-                                        <td className="px-5 py-3 text-right text-gray-400 text-xs">{item.note}</td>
-                                        <td className={`px-5 py-3 text-right font-medium ${item.cost < 0 ? 'text-red-500' : 'text-gray-900'}`}>
-                                        {formatCurrency(item.cost)}
-                                        </td>
-                                    </tr>
-                                    ))}
-                                </tbody>
-                                </table>
-                            </div>
-                            </div>
-                        ))}
-                        </div>
-                    ) : (
-                        <div className="space-y-8 animate-fade-in">
-                        <div className="flex items-center gap-3 pb-4 border-b border-emerald-100">
-                            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                            <Building size={20} />
-                            </div>
-                            <div>
-                            <h2 className="text-xl font-bold text-gray-800">총대의원회 운영 비용</h2>
-                            <p className="text-sm text-gray-500">감사, 선거 관리 및 사무 운영 예산</p>
-                            </div>
-                        </div>
+/* ──────────────────────────────
+   RENDER: GROUPED (축구, 농구)
+────────────────────────────── */
+function renderGrouped(sp) {
+  const N1 = sp.r1.matches.length; // 12
+  const N2 = sp.r2.n;              // 6
+  const totalH = N1 * SH;
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            {councilBudget.map((cat, idx) => (
-                            <div key={idx} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all">
-                                <h4 className="font-bold text-gray-700 text-lg mb-2">{cat.category}</h4>
-                                <p className="text-xs text-gray-500 mb-4 h-8">{cat.desc}</p>
-                                <div className="text-right border-t border-gray-100 pt-3">
-                                    <span className="text-2xl font-bold text-emerald-600">{formatCurrency(cat.subtotal)}</span>
-                                    <span className="text-sm text-gray-400 ml-1">원</span>
-                                </div>
-                            </div>
-                            ))}
-                        </div>
+  // Legend
+  let html = `<div class="view-legend">
+    <span>총 ${sp.teams}팀 참가</span>`;
+  if (sp.r1.note) html += `<span style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:4px;padding:3px 10px;font-size:12px;color:#1D4ED8">ⓘ ${sp.r1.note}</span>`;
+  html += `</div>`;
 
-                        {councilBudget.map((cat, index) => (
-                            <div key={index} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-r from-emerald-50 to-white px-5 py-3 border-b border-emerald-100 flex justify-between items-center">
-                                <h3 className="font-bold text-emerald-900 text-lg flex items-center gap-2">
-                                <span className={`w-1.5 h-6 rounded-full block ${
-                                    index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-orange-500' : 'bg-emerald-500'
-                                }`}></span>
-                                {cat.category}
-                                </h3>
-                                <span className="font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
-                                {formatCurrency(cat.subtotal)}원
-                                </span>
-                            </div>
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-50 text-gray-500 border-b border-gray-100">
-                                <tr>
-                                    <th className="px-5 py-3 font-medium text-gray-600">세부 항목 명</th>
-                                    <th className="px-5 py-3 font-medium text-right text-gray-600">지출 금액</th>
-                                </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                {cat.items.map((item, i) => (
-                                    <tr key={i} className="hover:bg-emerald-50/30 transition-colors">
-                                    <td className="px-5 py-3 font-medium text-gray-800">{item.name}</td>
-                                    <td className="px-5 py-3 text-right font-bold text-gray-900">{formatCurrency(item.cost)}</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                            </div>
-                        ))}
-                        </div>
-                    )}
-                    </div>
-                    
-                    {/* 통합 요약 푸터 */}
-                    <div className="bg-gray-900 text-white p-8">
-                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <PieChart className="text-yellow-400" size={24} />
-                        기구별 예산 요약
-                    </h3>
-                    <div className="flex flex-col md:flex-row gap-6">
-                        <div className="flex-1 bg-gray-800/50 rounded-xl p-5 border border-gray-700 hover:bg-gray-800 transition-colors">
-                        <div className="flex justify-between items-start mb-2">
-                            <p className="text-gray-400 text-sm">총동아리연합회</p>
-                            <Users className="text-indigo-400 opacity-50" size={20} />
-                        </div>
-                        <p className="text-2xl font-bold mb-1">{formatCurrency(allianceTotal)}원</p>
-                        <div className="w-full bg-gray-700 h-1.5 rounded-full mt-2 overflow-hidden">
-                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${(allianceTotal / grandTotal) * 100}%` }}></div>
-                        </div>
-                        <p className="text-xs text-right text-gray-500 mt-1">{((allianceTotal / grandTotal) * 100).toFixed(1)}% 비중</p>
-                        </div>
+  html += `<div class="bracket-scroll"><div class="bracket">`;
 
-                        <div className="flex-1 bg-gray-800/50 rounded-xl p-5 border border-gray-700 hover:bg-gray-800 transition-colors">
-                        <div className="flex justify-between items-start mb-2">
-                            <p className="text-gray-400 text-sm">총대의원회</p>
-                            <Building className="text-emerald-400 opacity-50" size={20} />
-                        </div>
-                        <p className="text-2xl font-bold mb-1">{formatCurrency(councilTotal)}원</p>
-                        <div className="w-full bg-gray-700 h-1.5 rounded-full mt-2 overflow-hidden">
-                            <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${(councilTotal / grandTotal) * 100}%` }}></div>
-                        </div>
-                        <p className="text-xs text-right text-gray-500 mt-1">{((councilTotal / grandTotal) * 100).toFixed(1)}% 비중</p>
-                        </div>
+  /* Round 1 */
+  let r1slots = '';
+  for (const m of sp.r1.matches) {
+    r1slots += `<div class="mslot" style="height:${SH}px"><div class="mbox">${T(m[0])}${T(m[1])}</div></div>`;
+  }
+  html += roundCol(sp.r1.name, r1slots);
 
-                        <div className="flex-1 bg-gradient-to-br from-indigo-900 to-slate-800 rounded-xl p-5 border border-indigo-700/50 shadow-lg relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400/10 rounded-full blur-2xl group-hover:bg-yellow-400/20 transition-all"></div>
-                        <div className="relative z-10">
-                            <p className="text-indigo-200 text-sm mb-1">전체 통합 예산</p>
-                            <p className="text-3xl font-bold text-white mb-2">{formatCurrency(grandTotal)}원</p>
-                            <div className="flex items-center gap-2 text-xs text-indigo-300">
-                                <ArrowRight size={14} />
-                                <span>2개 기구 합계</span>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                </div>
-            );
-        };
+  /* Connector 1→2 */
+  html += connCol(N2, 2*SH);
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<BudgetSheet />);
-    </script>
+  /* Round 2 */
+  let r2slots = '';
+  for (let i=0;i<N2;i++) {
+    r2slots += `<div class="mslot" style="height:${2*SH}px"><div class="mbox">${T('')}${T('')}</div></div>`;
+  }
+  html += roundCol(sp.r2.name, r2slots);
+
+  /* Connector 2→GS (3 slots → 1 group) */
+  html += connCol(sp.gs.groups.length, 3*SH);
+
+  /* Group Stage */
+  let gsSlots = '';
+  for (const g of sp.gs.groups) {
+    gsSlots += `<div class="gs-slot" style="height:${3*SH}px;align-items:flex-start;padding-top:12px">
+      <div class="gs-box">
+        <div class="gs-label">${g.name}</div>
+        <div class="gs-rule">${sp.gs.rule}</div>
+        ${g.teams.map(t=>T(t)).join('')}
+      </div>
+    </div>`;
+  }
+  html += `<div class="gs-col">
+    <div class="rcol-head">${sp.gs.name}</div>
+    <div class="rcol-body">${gsSlots}</div>
+  </div>`;
+
+  /* Connector GS→Final */
+  html += connCol(1, totalH);
+
+  /* Final */
+  html += roundCol(sp.fin,
+    `<div class="mslot" style="height:${totalH}px"><div class="mbox">${T('')}${T('')}</div></div>`
+  );
+
+  /* Connector Final→Champion */
+  html += connColSingle(totalH);
+
+  /* Champion */
+  html += `<div class="champ-wrap" style="height:${totalH+14}px">
+    <div class="champ-card">
+      <div class="champ-icon">🏆</div>
+      <div class="champ-lbl">우승</div>
+      <div class="champ-val">—</div>
+    </div>
+  </div>`;
+
+  html += `</div></div>`;
+  return html;
+}
+
+/* ──────────────────────────────
+   RENDER: KO4 (족구 등)
+────────────────────────────── */
+function renderKO4(sp) {
+  const N1 = sp.r1.matches.length;
+  const totalH = N1 * SH;
+
+  let html = `<div class="view-legend">
+    <span>총 ${sp.teams}팀 참가</span>`;
+  if (sp.byes && sp.byes.length > 0) {
+    html += `<span class="bye-note">🎗 부전승: ${sp.byes.join(', ')}</span>`;
+  }
+  html += `</div>`;
+
+  html += `<div class="bracket-scroll"><div class="bracket">`;
+
+  /* Round 1 */
+  let r1slots = '';
+  for (const m of sp.r1.matches) {
+    r1slots += `<div class="mslot" style="height:${SH}px"><div class="mbox">${T(m[0])}${T(m[1])}</div></div>`;
+  }
+  html += roundCol(sp.r1.name, r1slots);
+
+  /* Conn 1→2 */
+  html += connCol(sp.r2.n, 2*SH);
+
+  /* Round 2 */
+  let r2slots = '';
+  for (let i=0;i<sp.r2.n;i++) {
+    r2slots += `<div class="mslot" style="height:${2*SH}px"><div class="mbox">${T('')}${T('')}</div></div>`;
+  }
+  html += roundCol(sp.r2.name, r2slots);
+
+  /* Conn 2→3 */
+  html += connCol(sp.r3.n, 4*SH);
+
+  /* Round 3 */
+  let r3slots = '';
+  for (let i=0;i<sp.r3.n;i++) {
+    r3slots += `<div class="mslot" style="height:${4*SH}px"><div class="mbox">${T('')}${T('')}</div></div>`;
+  }
+  html += roundCol(sp.r3.name, r3slots);
+
+  /* Conn 3→Final */
+  html += connCol(1, totalH);
+
+  /* Final */
+  html += roundCol(sp.fin,
+    `<div class="mslot" style="height:${totalH}px"><div class="mbox">${T('')}${T('')}</div></div>`
+  );
+
+  /* Conn Final→Champ */
+  html += connColSingle(totalH);
+
+  /* Champion */
+  html += `<div class="champ-wrap" style="height:${totalH+14}px">
+    <div class="champ-card">
+      <div class="champ-icon">🏆</div>
+      <div class="champ-lbl">우승</div>
+      <div class="champ-val">—</div>
+    </div>
+  </div>`;
+
+  html += `</div></div>`;
+
+  /* 3·4위전 */
+  if (sp.tp) {
+    html += `<div class="extra-round">
+      <div class="mini-section">
+        <div class="mini-head">${sp.tp}</div>
+        <div class="mini-match">
+          <div class="mbox">${T('')}${T('')}</div>
+          <span class="mini-result">3위 결정</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+/* ──────────────────────────────
+   INIT
+────────────────────────────── */
+SPORTS.forEach(sp => {
+  const el = document.getElementById(sp.id);
+  if (!el) return;
+  el.innerHTML = sp.kind === 'grouped' ? renderGrouped(sp) : renderKO4(sp);
+});
+
+function show(id, btn) {
+  document.querySelectorAll('.sport-view').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+</script>
 </body>
 </html>
